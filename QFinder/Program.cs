@@ -8,15 +8,18 @@ namespace QFinder
 {
     static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
+        
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+
+            //create a controller and Pass an instance of your application main form
+            var controller = new QFinder.ApplicationController(new frmFind());
+
+            //Run application
+            controller.Run(Environment.GetCommandLineArgs());
         }
     }
 }
