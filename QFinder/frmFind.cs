@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
+using QFinder.Data;
 
 namespace QFinder
 {
@@ -76,38 +77,17 @@ namespace QFinder
 
         private string[] SuggestStrings(string text)
         {
-            var dirs = new List<string>();
+            Model model = new Model();
+            var dirs = model.Files
+                .Where(i => i.FullPath.Contains(text))
+                .Select(i => i.Name);
 
-            dirs.Add(@"D:\Files");
-            dirs.Add(@"D:\Install");
-            dirs.Add(@"D:\Pictures");
-            dirs.Add(@"D:\Music");
-            dirs.Add(@"D:\Videos");
-            dirs.Add(@"D:\Projetos");
-            dirs.Add(@"D:\RDP");
-
-            var ret = new List<string>();
-
-            foreach (var dir in dirs)
-            {
-                ret.AddRange(GetFiles(dir, text));
-            }
-
-            return ret.ToArray();
+            return dirs.ToArray();
         }
-
-        private string[] GetFiles(string path, string term = "")
+        
+        private void tmrIndex_Tick(object sender, EventArgs e)
         {
-            var ret = new List<string>();
-            var firstDirectories = Directory.GetDirectories(path).Where(src => src.Contains(term));
-            ret.AddRange(firstDirectories);
-            foreach (var childDir in Directory.GetDirectories(path))
-            {
-                ret.AddRange(GetFiles(path, term));
-            }
-            ret.AddRange(Directory.GetFiles(path).Where(src => src.Contains(term)));
-            return ret.ToArray();
+            Program.Idx.BuildIndex();
         }
-
     }
 }

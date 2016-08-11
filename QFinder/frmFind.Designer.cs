@@ -35,6 +35,7 @@
             this.ntfIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.ctxNtfIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tmrIndex = new System.Windows.Forms.Timer(this.components);
             this.ctxNtfIcon.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -86,6 +87,12 @@
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
+            // tmrIndex
+            // 
+            this.tmrIndex.Enabled = true;
+            this.tmrIndex.Interval = 1800000;
+            this.tmrIndex.Tick += new System.EventHandler(this.tmrIndex_Tick);
+            // 
             // frmFind
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 35F);
@@ -122,6 +129,7 @@
         private System.Windows.Forms.NotifyIcon ntfIcon;
         private System.Windows.Forms.ContextMenuStrip ctxNtfIcon;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.Timer tmrIndex;
     }
 }
 
