@@ -10,9 +10,9 @@ namespace QFinder.Data
         public Model()
             : base(Program.DB.GetConnectionString())
         {
-            
+           
         }
-        
+                
         public virtual DbSet<FileIndex> Files { get; set; }
         public virtual DbSet<FileIndexType> FileIndexTypes { get; set; }
         public virtual DbSet<IndexingPath> IndexingPaths { get; set; }

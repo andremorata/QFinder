@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QFinder.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,20 +18,12 @@ namespace QFinder
         {
             try
             {
-                DB = new Data.DB();
-                DB.Folder = Application.StartupPath + "\\Data";
-                if (!DB.Check()) DB.CreateDB();
-                DB.CheckDbStructure();
-                
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
                 //create a controller and Pass an instance of your application main form
-                var controller = new QFinder.ApplicationController(new frmFind());
+                var controller = new ApplicationController(new frmFind());
 
-                //Run indexing subsystem
-                Idx = new Index.Index();
-                Idx.BuildIndex();
 
                 //Run application
                 controller.Run(Environment.GetCommandLineArgs());

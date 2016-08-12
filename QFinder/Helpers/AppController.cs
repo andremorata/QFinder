@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.VisualBasic.ApplicationServices;
 using System.Windows.Forms;
 
-namespace QFinder
+namespace QFinder.Helpers
 {
     public class ApplicationController : WindowsFormsApplicationBase
     {

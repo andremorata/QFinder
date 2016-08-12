@@ -10,28 +10,37 @@ using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
 using QFinder.Data;
+using QFinder.Helpers;
+using System.Collections;
 
 namespace QFinder
 {
     public partial class frmFind : Form
     {
 
-        #region initialize and form handles
+        TypeAssistant assistant;
 
         public frmFind()
         {
+            //Application startup
+            Program.DB = new Data.DB();
+            Program.DB.Folder = Application.StartupPath + "\\Data";
+            if (!Program.DB.Check()) Program.DB.CreateDB();
+            Program.DB.CheckDbStructure();
+
+            //Run indexing subsystem
+            Program.Idx = new Index.Index();
+            Program.Idx.BuildIndex();
+
             InitializeComponent();
+
+            assistant = new TypeAssistant();
+            assistant.Idled += Assistant_Idled;
+
         }
 
-
-        private void frmFind_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Escape)
-            {
-                Hide();
-            }
-        }
-
+        #region initialize and form handles
+        
         private void frmFind_Resize(object sender, EventArgs e)
         {
             if (WindowState == FormWindowState.Minimized) Hide();
@@ -52,39 +61,69 @@ namespace QFinder
 
         #endregion
 
-        private void txtFind_KeyDown(object sender, KeyEventArgs e)
+        private void frmFind_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.Escape)
+            {
+                Hide();
+            }
+
             if (e.KeyCode == Keys.Enter)
             {
-                Process.Start(txtFind.Text.Trim());
+                try
+                {
+                    var selected = lstFiles.SelectedItems;
+                    if (selected != null && selected.Count > 0 && selected[0] != null)
+                    {
+                        var item = selected[0];
+                        Process.Start(item.SubItems[3].Text); //fullpath
+                        Hide();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("The item you entered has failed to start. Please check if the file still exists or the commando is an available one." +
+                        "\r\n\r\n Internal Error message: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
+
         }
+       
+        private void Assistant_Idled(object sender, EventArgs e)
+        {
+            this.Invoke(
+                new MethodInvoker(() =>
+                {
+                    lstFiles.Items.Clear();
+                    var suggests = SuggestStrings(txtFind.Text.Trim());
+                    foreach (var item in suggests)
+                        lstFiles.Items.Add(new ListViewItem(
+                                new string[] { item.Name, item.Type.Name, item.Extension, item.FullPath }));
+                })
+            );
+        }
+
 
         private void txtFind_TextChanged(object sender, EventArgs e)
         {
-            TextBox t = sender as TextBox;
-            if (t != null)
+            if (txtFind.Text.Length >= 3)
             {
-                if (t.Text.Length >= 3)
-                {
-                    string[] arr = SuggestStrings(t.Text);
-                    AutoCompleteStringCollection collection = new AutoCompleteStringCollection();
-                    collection.AddRange(arr);
-                    txtFind.AutoCompleteCustomSource = collection;
-                }
+                assistant.TextChanged();
             }
         }
 
-        private string[] SuggestStrings(string text)
+        private ICollection<FileIndex> SuggestStrings(string text)
         {
             Model model = new Model();
-            var dirs = model.Files
-                .Where(i => i.FullPath.Contains(text))
-                .Select(i => i.Name);
+            
+            var files = model.Files
+                .Include("Type")
+                .Where(i => i.Name.ToLower().Contains(text.ToLower()))
+                .Take(10);
 
-            return dirs.ToArray();
+            return files.ToList();
         }
-        
+
         private void tmrIndex_Tick(object sender, EventArgs e)
         {
             Program.Idx.BuildIndex();

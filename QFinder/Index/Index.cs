@@ -51,37 +51,45 @@ namespace QFinder.Index
 
         private void AddIndexedItem(string type, string path)
         {
-            Model model = new Model();
-
-            var itemType = model.FileIndexTypes.FirstOrDefault(i => i.Name == type);
-
-            var itemExt = "";
-            if (itemType.Name != "Folder" && path.LastIndexOf(".") >= 0)
-                itemExt = path.Substring(path.LastIndexOf("."));
-
-            if (!model.Files.Any(i => i.FullPath == path))
+            try
             {
-                model.Files.Add(
-                    new FileIndex()
-                    {
-                        Type = itemType,
-                        Name = path.Substring(path.LastIndexOf("\\") + 1),
-                        Extension = itemExt,
-                        FullPath = path
-                    });
-            }
-            else
-            {
-                var file = model.Files.FirstOrDefault(i => i.FullPath == path);
-                if (file != null)
+                Model model = new Model();
+
+                var itemType = model.FileIndexTypes.FirstOrDefault(i => i.Name == type);
+
+                var itemExt = "";
+                if (itemType.Name != "Folder" && path.LastIndexOf(".") >= 0)
+                    itemExt = path.Substring(path.LastIndexOf("."));
+
+                if (!model.Files.Any(i => i.FullPath == path))
                 {
-                    file.Type = itemType;
-                    file.Name = path.Substring(path.LastIndexOf("\\") + 1);
-                    file.Extension = itemExt;
-                    file.FullPath = path;
+                    model.Files.Add(
+                        new FileIndex()
+                        {
+                            Type = itemType,
+                            Name = path.Substring(path.LastIndexOf("\\") + 1),
+                            Extension = itemExt,
+                            FullPath = path
+                        });
                 }
+                else
+                {
+                    var file = model.Files.FirstOrDefault(i => i.FullPath == path);
+                    if (file != null)
+                    {
+                        file.Type = itemType;
+                        file.Name = path.Substring(path.LastIndexOf("\\") + 1);
+                        file.Extension = itemExt;
+                        file.FullPath = path;
+                    }
+                }
+                model.SaveChanges();
             }
-            model.SaveChanges();
+            catch
+            {
+                throw;
+            }
+            
         }
 
 
