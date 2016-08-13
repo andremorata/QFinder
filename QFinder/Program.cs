@@ -12,6 +12,7 @@ namespace QFinder
 
         public static Data.DB DB { get; set; }
         public static Index.Index Idx { get; set; }
+        public static bool LogEnabled { get; internal set; }
 
         [STAThread]
         static void Main()
@@ -23,7 +24,6 @@ namespace QFinder
 
                 //create a controller and Pass an instance of your application main form
                 var controller = new ApplicationController(new frmFind());
-
 
                 //Run application
                 controller.Run(Environment.GetCommandLineArgs());

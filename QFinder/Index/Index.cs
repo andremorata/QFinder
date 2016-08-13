@@ -1,9 +1,10 @@
 ﻿using QFinder.Data;
+using QFinder.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace QFinder.Index
@@ -36,15 +37,41 @@ namespace QFinder.Index
             var ret = new List<string>();
             var firstDirectories = Directory.GetDirectories(path).Where(src => src.Contains(term));
             ret.AddRange(firstDirectories);
-            foreach (var item in firstDirectories) AddIndexedItem("Folder", item);
+            foreach (var item in firstDirectories)
+            {
+                try { AddIndexedItem("Folder", item); }
+                catch (Exception ex)
+                {
+                    LogFailure(ex.Message);
+                }
+            }
+
             foreach (var childDir in Directory.GetDirectories(path))
             {
-                AddIndexedItem("Folder", childDir);
-                ret.AddRange(Map(childDir, term));
+                try
+                {
+                    AddIndexedItem("Folder", childDir);
+                    ret.AddRange(Map(childDir, term));
+                }
+                catch (Exception ex)
+                {
+                    LogFailure(ex.Message);
+                }
             }
+
             var dirFiles = Directory.GetFiles(path).Where(src => src.Contains(term));
             ret.AddRange(dirFiles);
-            foreach (var item in dirFiles) AddIndexedItem("File", item);
+            foreach (var item in dirFiles)
+            {
+                try
+                {
+                    AddIndexedItem("File", item);
+                }
+                catch (Exception ex)
+                {
+                    LogFailure(ex.Message);
+                }
+            }
             return ret.ToArray();
         }
 
@@ -85,11 +112,16 @@ namespace QFinder.Index
                 }
                 model.SaveChanges();
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                LogFailure(ex.Message);
             }
-            
+
+        }
+
+        private void LogFailure(string error)
+        {
+            Log.Write(EventLogEntryType.Error, error);
         }
 
 

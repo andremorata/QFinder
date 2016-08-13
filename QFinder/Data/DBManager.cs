@@ -46,6 +46,7 @@ namespace QFinder.Data
                 {
                     SqlCeEngine engine = new SqlCeEngine(connStr);
                     engine.CreateDatabase();
+                    CheckDbStructure();
                 }
                 catch (Exception ex)
                 {
@@ -58,8 +59,7 @@ namespace QFinder.Data
         {
             try
             {
-                Model m = new Model();
-                
+                Model m = new Model();                
                 if (!m.IndexingPaths.Any())
                 {
                     m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files" });

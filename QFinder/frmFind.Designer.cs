@@ -37,10 +37,11 @@
             this.tmrIndex = new System.Windows.Forms.Timer(this.components);
             this.txtFind = new System.Windows.Forms.TextBox();
             this.lstFiles = new System.Windows.Forms.ListView();
-            this.colType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ColName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colExt = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colFullPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.lbInfo = new System.Windows.Forms.Label();
             this.ctxNtfIcon.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -111,33 +112,45 @@
             this.lstFiles.UseCompatibleStateImageBehavior = false;
             this.lstFiles.View = System.Windows.Forms.View.Details;
             // 
-            // colType
-            // 
-            this.colType.Text = "Type";
-            this.colType.Width = 52;
-            // 
             // ColName
             // 
             this.ColName.Text = "Name";
-            this.ColName.Width = 279;
+            this.ColName.Width = 652;
+            // 
+            // colType
+            // 
+            this.colType.Text = "Type";
+            this.colType.Width = 64;
             // 
             // colExt
             // 
             this.colExt.Text = "Extension";
-            this.colExt.Width = 82;
+            this.colExt.Width = 117;
             // 
             // colFullPath
             // 
             this.colFullPath.Text = "FullPath";
-            this.colFullPath.Width = 395;
+            this.colFullPath.Width = 0;
+            // 
+            // lbInfo
+            // 
+            this.lbInfo.AutoSize = true;
+            this.lbInfo.Font = new System.Drawing.Font("Ubuntu Mono", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbInfo.Location = new System.Drawing.Point(9, 327);
+            this.lbInfo.Name = "lbInfo";
+            this.lbInfo.Size = new System.Drawing.Size(192, 17);
+            this.lbInfo.TabIndex = 4;
+            this.lbInfo.Text = "Gathering Index Info...";
+            this.lbInfo.DoubleClick += new System.EventHandler(this.lbInfo_DoubleClick);
             // 
             // frmFind
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 35F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(891, 332);
+            this.ClientSize = new System.Drawing.Size(891, 352);
             this.ControlBox = false;
+            this.Controls.Add(this.lbInfo);
             this.Controls.Add(this.lstFiles);
             this.Controls.Add(this.txtFind);
             this.Controls.Add(this.label1);
@@ -154,6 +167,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "QFinder";
             this.TopMost = true;
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmFind_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmFind_KeyDown);
             this.Resize += new System.EventHandler(this.frmFind_Resize);
             this.ctxNtfIcon.ResumeLayout(false);
@@ -174,6 +188,7 @@
         private System.Windows.Forms.ColumnHeader ColName;
         private System.Windows.Forms.ColumnHeader colExt;
         private System.Windows.Forms.ColumnHeader colFullPath;
+        private System.Windows.Forms.Label lbInfo;
     }
 }
 
