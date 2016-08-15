@@ -12,13 +12,14 @@ namespace QFinder
 
         public static Data.DB DB { get; set; }
         public static Index.Index Idx { get; set; }
-        public static bool LogEnabled { get; internal set; }
+        public static bool LogEnabled { get; set; }
 
         [STAThread]
         static void Main()
         {
             try
             {
+                LogEnabled = true;
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 

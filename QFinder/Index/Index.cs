@@ -15,12 +15,24 @@ namespace QFinder.Index
         {
             var indexTask = Task.Run(() =>
             {
+                Log.Write($"QFinder - Indexing Started at {DateTime.Now.ToString()}");
                 Model model = new Model();
                 var dirs = model.IndexingPaths.Select(i => i.Path);
                 var mapped = new List<string>();
 
+                List<Task> factory = new List<Task>();
+
                 foreach (var dir in dirs)
-                    mapped.AddRange(Map(dir));
+                {
+                    factory.Add(
+                        Task.Factory.StartNew(() =>
+                        {
+                            mapped.AddRange(Map(dir));
+                        })
+                    );
+                }
+
+                Task.WaitAll(factory.ToArray());
 
                 var toBeRemoved = new List<FileIndex>();
                 foreach (var item in model.Files)
@@ -29,6 +41,7 @@ namespace QFinder.Index
 
                 model.Files.RemoveRange(toBeRemoved);
                 model.SaveChanges();
+                Log.Write($"QFinder - Indexing Ended at {DateTime.Now.ToString()}");
             });
         }
 
@@ -84,37 +97,34 @@ namespace QFinder.Index
 
                 var itemType = model.FileIndexTypes.FirstOrDefault(i => i.Name == type);
 
-                var itemExt = "";
-                if (itemType.Name != "Folder" && path.LastIndexOf(".") >= 0)
-                    itemExt = path.Substring(path.LastIndexOf("."));
+                var folder = path;
+                if (itemType.Name != "Folder")
+                    folder = path.Substring(0, path.LastIndexOf("\\"));
 
-                if (!model.Files.Any(i => i.FullPath == path))
+                var ext = "";
+                var name = path.Substring(path.LastIndexOf("\\") + 1);
+                if (itemType.Name != "Folder" && name.LastIndexOf(".") >= 0)
+                {
+                    ext = name.Substring(name.LastIndexOf(".") + 1).ToUpper();
+                    name = name.Substring(0, name.LastIndexOf("."));
+                }
+                
+                if (!model.Files.Any(i => i.Path == folder && i.Name == name && i.Extension == ext))
                 {
                     model.Files.Add(
                         new FileIndex()
                         {
                             Type = itemType,
-                            Name = path.Substring(path.LastIndexOf("\\") + 1),
-                            Extension = itemExt,
-                            FullPath = path
+                            Name = name,
+                            Extension = ext,
+                            Path = folder
                         });
-                }
-                else
-                {
-                    var file = model.Files.FirstOrDefault(i => i.FullPath == path);
-                    if (file != null)
-                    {
-                        file.Type = itemType;
-                        file.Name = path.Substring(path.LastIndexOf("\\") + 1);
-                        file.Extension = itemExt;
-                        file.FullPath = path;
-                    }
                 }
                 model.SaveChanges();
             }
             catch (Exception ex)
             {
-                LogFailure(ex.Message);
+                LogFailure(ex.Message + "\r\n" + path);
             }
 
         }

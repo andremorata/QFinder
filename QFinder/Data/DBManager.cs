@@ -62,14 +62,17 @@ namespace QFinder.Data
                 Model m = new Model();                
                 if (!m.IndexingPaths.Any())
                 {
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Install" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Pictures" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Music" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Videos" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Projetos" });
                     m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\RDP" });
-
+                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\OneDrive" });
+                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\PM" });
+                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Project Manager - Projetos" });
+                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Project Manager - Propostas Comerciais" });
+                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Project Manager - Institucional" });
+                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Project Manager - Diretoria" });
+                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Project Manager - Desenvolvimento" });
+                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Learning" });
+                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Andre" });
+                    
                     m.SaveChanges();
                 }
 

@@ -1,10 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
+
 namespace QFinder.Data
 {
-    using System;
-    using System.ComponentModel.DataAnnotations;
-    using System.Data.Entity;
-    using System.Linq;
-
+ 
     public class Model : DbContext
     {
         public Model()
@@ -29,10 +29,33 @@ namespace QFinder.Data
     {
         [Key]
         public int Id { get; set; }
+        [Index]
         public string Name { get; set; }
+        [Index]
         public string Extension { get; set; }
-        public string FullPath { get; set; }
+        [Index]
+        public string Path { get; set; }
         public FileIndexType Type { get; set; }
+        public string FileName
+        {
+            get
+            {
+                if (Type.Name != "Folder")
+                    return $"{Name}.{Extension}";
+                else
+                    return Name;
+            }
+        }
+        public string FullPath
+        {
+            get
+            {
+                if (Type.Name != "Folder")
+                    return $"{Path}\\{FileName}";
+                else
+                    return Path;
+            }
+        }
     }
 
     public class IndexingPath

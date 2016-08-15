@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
 using System.Diagnostics;
 using QFinder.Data;
 using QFinder.Helpers;
-using System.Collections;
-using System.Threading;
 
 namespace QFinder
 {
@@ -37,9 +31,10 @@ namespace QFinder
 
                 //Run indexing subsystem
                 Program.Idx = new Index.Index();
-                Program.Idx.BuildIndex();
+                //Program.Idx.BuildIndex();
             });
             ShowIndexInfo();
+            txtFind.Focus();
         }
 
         private async void ShowIndexInfo()
@@ -56,6 +51,13 @@ namespace QFinder
         }
 
         #region initialize and form handles
+
+        private new void Hide()
+        {
+            base.Hide();
+            txtFind.Text = "";
+            lstFiles.Items.Clear();
+        }
 
         private void frmFind_Resize(object sender, EventArgs e)
         {
@@ -77,13 +79,6 @@ namespace QFinder
 
         #endregion
 
-        private new void Hide()
-        {
-            base.Hide();
-            txtFind.Text = "";
-            lstFiles.Items.Clear();
-        }
-
         private void frmFind_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
@@ -100,6 +95,11 @@ namespace QFinder
                     {
                         var item = selected[0];
                         Process.Start(item.SubItems[3].Text); //fullpath
+                        Hide();
+                    }
+                    else if (!string.IsNullOrEmpty(txtFind.Text.Trim()))
+                    {
+                        Process.Start(txtFind.Text.Trim());
                         Hide();
                     }
                 }
@@ -121,6 +121,11 @@ namespace QFinder
             {
                 txtFind.Focus();
             }
+
+            if (e.KeyCode == Keys.D && e.Modifiers == Keys.Alt)
+            {
+                txtFind.Focus();
+            }
         }
 
         private void Assistant_Idled(object sender, EventArgs e)
@@ -129,10 +134,11 @@ namespace QFinder
                 new MethodInvoker(() =>
                 {
                     lstFiles.Items.Clear();
-                    var suggests = SuggestStrings(txtFind.Text.Trim());
+                    lbFullPath.Text = "";
+                    var suggests = GetIndex(txtFind.Text.Trim());
                     foreach (var item in suggests)
                         lstFiles.Items.Add(new ListViewItem(
-                            new string[] { item.Name, item.Type.Name, item.Extension, item.FullPath }));
+                            new string[] { item.FileName, item.Type.Name, item.Extension, item.FullPath }));
                 })
             );
         }
@@ -145,7 +151,7 @@ namespace QFinder
             }
         }
 
-        private ICollection<FileIndex> SuggestStrings(string text)
+        private ICollection<FileIndex> GetIndex(string text)
         {
             using (var model = new Model())
             {
@@ -157,8 +163,49 @@ namespace QFinder
                 }
 
                 var files = model.Files.Include("Type").AsQueryable();
-                if (type != "") files = files.Where(i => i.Extension.EndsWith(type));
-                files = files.Where(i => i.Name.ToLower().Contains(text.ToLower()));
+                if (type != "") files = files.Where(i => i.Extension.Equals(type));
+
+                if (text.Contains("/"))
+                {
+                    var folder = text.Split('/')[0];
+                    text = text.Split('/')[1];
+                    if (folder != "") files = files.Where(i => i.Path.Contains(folder));
+                }
+
+                var terms = text.Split(' ');
+                if (terms.Count() > 0)
+                {
+                    foreach (var term in terms)
+                    {
+                        if (term.StartsWith("*"))
+                        {
+                            var val = term.Replace("*", "");
+                            files = files.Where(i => i.Name.ToLower()
+                                .Substring(i.Name.Length - val.Length, val.Length) == val.ToLower()); //.EndsWith(term.ToLower()));
+                        }
+                        else if (term.EndsWith("*"))
+                        {
+                            var val = term.Replace("*", "");
+                            files = files.Where(i => i.Name.ToLower()
+                                .StartsWith(val.ToLower()));
+                        }
+                        else if (term.Contains("*"))
+                        {
+                            var start = term.ToLower().Split('*')[0];
+                            var end = term.ToLower().Split('*')[1];
+                            files = files.Where(i => i.Name.ToLower()
+                                .StartsWith(start) && i.Name.ToLower()
+                                .Substring(i.Name.ToLower().Length - end.Length, end.Length) == end.ToLower()
+                            );
+                        }
+                        else
+                            files = files.Where(i => i.Name.ToLower().Contains(term.ToLower()));
+                    }
+                }
+                else
+                {
+                    files = files.Where(i => i.Name.ToLower().Contains(text.ToLower()));
+                }
 
                 return files.ToList();
             }
@@ -166,7 +213,7 @@ namespace QFinder
 
         private void tmrIndex_Tick(object sender, EventArgs e)
         {
-            Program.Idx.BuildIndex();
+            //Program.Idx.BuildIndex();
         }
 
         private void lbInfo_DoubleClick(object sender, EventArgs e)
@@ -174,10 +221,44 @@ namespace QFinder
             lbInfo.Text = "Gathering Index Info...";
             ShowIndexInfo();
         }
+        
+        private void frmFind_Shown(object sender, EventArgs e)
+        {
+            txtFind.Focus();
+        }
 
-        private void frmFind_FormClosing(object sender, FormClosingEventArgs e)
+        private void lstFiles_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var selected = lstFiles.SelectedItems;
+            if (selected != null && selected.Count > 0 && selected[0] != null)
+            {
+                var item = selected[0];
+                lbFullPath.Text = item.SubItems[3].Text; //fullpath
+            }
+            else
+            {
+                lbFullPath.Text = "";
+            }
+        }
+
+        private void tmrInfo_Tick(object sender, EventArgs e)
+        {
+            ShowIndexInfo();
+        }
+
+        private void frmFind_FormClosed(object sender, FormClosedEventArgs e)
         {
             ntfIcon.Visible = false;
+            ntfIcon.Icon = null;
+        }
+
+        private void lbReindex_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure that you want to re-map all files? This might take few minutes to complete.", 
+                "Rebuild Index", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
+            {
+                Program.Idx.BuildIndex();
+            }
         }
     }
 }
