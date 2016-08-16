@@ -31,9 +31,6 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmFind));
             this.label1 = new System.Windows.Forms.Label();
-            this.ntfIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.ctxNtfIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tmrIndex = new System.Windows.Forms.Timer(this.components);
             this.txtFind = new System.Windows.Forms.TextBox();
             this.lstFiles = new System.Windows.Forms.ListView();
@@ -45,7 +42,6 @@
             this.lbFullPath = new System.Windows.Forms.Label();
             this.tmrInfo = new System.Windows.Forms.Timer(this.components);
             this.lbReindex = new System.Windows.Forms.Label();
-            this.ctxNtfIcon.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -56,28 +52,6 @@
             this.label1.Size = new System.Drawing.Size(442, 35);
             this.label1.TabIndex = 1;
             this.label1.Text = "type something you want to find";
-            // 
-            // ntfIcon
-            // 
-            this.ntfIcon.ContextMenuStrip = this.ctxNtfIcon;
-            this.ntfIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("ntfIcon.Icon")));
-            this.ntfIcon.Text = "QFinder";
-            this.ntfIcon.Visible = true;
-            this.ntfIcon.DoubleClick += new System.EventHandler(this.ntfIcon_DoubleClick);
-            // 
-            // ctxNtfIcon
-            // 
-            this.ctxNtfIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exitToolStripMenuItem});
-            this.ctxNtfIcon.Name = "ctxNtfIcon";
-            this.ctxNtfIcon.Size = new System.Drawing.Size(93, 26);
-            // 
-            // exitToolStripMenuItem
-            // 
-            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
-            this.exitToolStripMenuItem.Text = "Exit";
-            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // tmrIndex
             // 
@@ -143,7 +117,7 @@
             // 
             this.lbInfo.AutoSize = true;
             this.lbInfo.Font = new System.Drawing.Font("Ubuntu Mono", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbInfo.Location = new System.Drawing.Point(42, 326);
+            this.lbInfo.Location = new System.Drawing.Point(42, 325);
             this.lbInfo.Name = "lbInfo";
             this.lbInfo.Size = new System.Drawing.Size(192, 17);
             this.lbInfo.TabIndex = 4;
@@ -171,7 +145,7 @@
             this.lbReindex.AutoSize = true;
             this.lbReindex.Cursor = System.Windows.Forms.Cursors.Hand;
             this.lbReindex.Font = new System.Drawing.Font("Webdings", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(2)));
-            this.lbReindex.ForeColor = System.Drawing.Color.OrangeRed;
+            this.lbReindex.ForeColor = System.Drawing.Color.DarkOrange;
             this.lbReindex.Location = new System.Drawing.Point(5, 320);
             this.lbReindex.Name = "lbReindex";
             this.lbReindex.Size = new System.Drawing.Size(40, 30);
@@ -185,7 +159,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(891, 371);
-            this.ControlBox = false;
             this.Controls.Add(this.lbReindex);
             this.Controls.Add(this.lbFullPath);
             this.Controls.Add(this.lbInfo);
@@ -205,11 +178,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "QFinder";
             this.TopMost = true;
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.frmFind_FormClosed);
-            this.Shown += new System.EventHandler(this.frmFind_Shown);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmFind_KeyDown);
-            this.Resize += new System.EventHandler(this.frmFind_Resize);
-            this.ctxNtfIcon.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -217,9 +186,6 @@
 
         #endregion
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.NotifyIcon ntfIcon;
-        private System.Windows.Forms.ContextMenuStrip ctxNtfIcon;
-        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.Timer tmrIndex;
         private System.Windows.Forms.TextBox txtFind;
         private System.Windows.Forms.ListView lstFiles;

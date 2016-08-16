@@ -19,6 +19,8 @@ namespace QFinder
         {
             InitializeComponent();
 
+            ShowInTaskbar = true;
+
             assistant = new TypeAssistant(1000);
             assistant.Idled += Assistant_Idled;
 
@@ -54,29 +56,13 @@ namespace QFinder
 
         private new void Hide()
         {
-            base.Hide();
+            base.WindowState = FormWindowState.Minimized;
             txtFind.Text = "";
+            txtFind.Focus();
+            lbFullPath.Text = "";
             lstFiles.Items.Clear();
         }
-
-        private void frmFind_Resize(object sender, EventArgs e)
-        {
-            if (WindowState == FormWindowState.Minimized) Hide();
-        }
-
-        private void ntfIcon_DoubleClick(object sender, EventArgs e)
-        {
-            WindowState = FormWindowState.Minimized;
-            Show();
-            WindowState = FormWindowState.Normal;
-        }
-
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
-
-
+        
         #endregion
 
         private void frmFind_KeyDown(object sender, KeyEventArgs e)
@@ -145,10 +131,7 @@ namespace QFinder
 
         private void txtFind_TextChanged(object sender, EventArgs e)
         {
-            if (txtFind.Text.Length >= 3)
-            {
-                assistant.TextChanged();
-            }
+            if (txtFind.Text.Length >= 3) assistant.TextChanged();
         }
 
         private ICollection<FileIndex> GetIndex(string text)
@@ -221,11 +204,6 @@ namespace QFinder
             lbInfo.Text = "Gathering Index Info...";
             ShowIndexInfo();
         }
-        
-        private void frmFind_Shown(object sender, EventArgs e)
-        {
-            txtFind.Focus();
-        }
 
         private void lstFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -244,12 +222,6 @@ namespace QFinder
         private void tmrInfo_Tick(object sender, EventArgs e)
         {
             ShowIndexInfo();
-        }
-
-        private void frmFind_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            ntfIcon.Visible = false;
-            ntfIcon.Icon = null;
         }
 
         private void lbReindex_Click(object sender, EventArgs e)
