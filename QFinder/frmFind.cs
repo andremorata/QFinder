@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using QFinder.Data;
 using QFinder.Helpers;
+using System.IO;
 
 namespace QFinder
 {
@@ -34,9 +35,12 @@ namespace QFinder
                 //Run indexing subsystem
                 Program.Idx = new Index.Index();
                 //Program.Idx.BuildIndex();
+                Program.Idx.StartMonitoring();
             });
+
             ShowIndexInfo();
             txtFind.Focus();
+
         }
 
         private async void ShowIndexInfo()
@@ -232,5 +236,6 @@ namespace QFinder
                 Program.Idx.BuildIndex();
             }
         }
+        
     }
 }

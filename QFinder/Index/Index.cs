@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace QFinder.Index
@@ -52,7 +53,7 @@ namespace QFinder.Index
             ret.AddRange(firstDirectories);
             foreach (var item in firstDirectories)
             {
-                try { AddIndexedItem("Folder", item); }
+                try { AddIndexedItem(item); }
                 catch (Exception ex)
                 {
                     LogFailure(ex.Message);
@@ -63,7 +64,7 @@ namespace QFinder.Index
             {
                 try
                 {
-                    AddIndexedItem("Folder", childDir);
+                    AddIndexedItem(childDir);
                     ret.AddRange(Map(childDir, term));
                 }
                 catch (Exception ex)
@@ -78,7 +79,7 @@ namespace QFinder.Index
             {
                 try
                 {
-                    AddIndexedItem("File", item);
+                    AddIndexedItem(item);
                 }
                 catch (Exception ex)
                 {
@@ -88,11 +89,25 @@ namespace QFinder.Index
             return ret.ToArray();
         }
 
+        private string GetIfIsFileOrFolder(string path)
+        {
+            if (Directory.Exists(path))
+                return "Folder";
+            else if (File.Exists(path))
+                return "File";
+            else
+                return null;
+        }
 
-        private void AddIndexedItem(string type, string path)
+        private void AddIndexedItem(string path)
         {
             try
             {
+
+                var type = GetIfIsFileOrFolder(path);
+
+                if (type == null) return;
+
                 Model model = new Model();
 
                 var itemType = model.FileIndexTypes.FirstOrDefault(i => i.Name == type);
@@ -108,7 +123,7 @@ namespace QFinder.Index
                     ext = name.Substring(name.LastIndexOf(".") + 1).ToUpper();
                     name = name.Substring(0, name.LastIndexOf("."));
                 }
-                
+
                 if (!model.Files.Any(i => i.Path == folder && i.Name == name && i.Extension == ext))
                 {
                     model.Files.Add(
@@ -134,6 +149,92 @@ namespace QFinder.Index
             Log.Write(EventLogEntryType.Error, error);
         }
 
+        #region Index Live Monitoring
+
+        public void StartMonitoring()
+        {
+            Model model = new Model();
+            var dirs = model.IndexingPaths.Select(i => i.Path);
+            foreach (var dir in dirs)
+            {
+                AddWatcher(dir);
+            }
+        }
+
+        private void AddWatcher(string path)
+        {
+            FileSystemWatcher watcher = new FileSystemWatcher();
+            watcher.Path = path;
+            watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            watcher.Filter = "*.*";
+            watcher.Created += Watcher_Created; ;
+            watcher.Deleted += Watcher_Deleted; ;
+            watcher.Renamed += Watcher_Renamed; ;
+            watcher.IncludeSubdirectories = true;
+            watcher.EnableRaisingEvents = true;
+        }
+
+        private void Watcher_Created(object sender, FileSystemEventArgs e)
+        {
+            try
+            {
+                Thread.Sleep(500);
+                AddIndexedItem(e.FullPath);
+                Log.Write($"QFinder - File added to index - {e.FullPath}");
+            }
+            catch (Exception ex)
+            {
+                LogFailure($"QFinder - Error: {ex.Message}");
+            }
+        }
+
+        private void Watcher_Deleted(object sender, FileSystemEventArgs e)
+        {
+            try
+            {
+                using (Model model = new Model())
+                {
+                    var file = model.Files.FirstOrDefault(i =>
+                        i.FullPath.Equals(e.FullPath, StringComparison.InvariantCultureIgnoreCase));
+                    if (file != null)
+                    {
+                        model.Files.Remove(file);
+                        model.SaveChanges();
+                    }
+                    Log.Write($"QFinder - File removed from index - {e.FullPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogFailure($"QFinder - Error: {ex.Message}");
+            }
+        }
+
+        private void Watcher_Renamed(object sender, RenamedEventArgs e)
+        {
+            try
+            {
+                using (Model model = new Model())
+                {
+                    var file = model.Files.FirstOrDefault(i =>
+                        i.FullPath.Equals(e.OldFullPath, StringComparison.InvariantCultureIgnoreCase));
+                    if (file != null)
+                    {
+                        model.Files.Remove(file);
+                        model.SaveChanges();
+
+                        AddIndexedItem(e.FullPath);
+                    }
+                    Log.Write($"QFinder - File removed from index - {e.FullPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogFailure($"QFinder - Error: {ex.Message}");
+            }
+        }
+
+        #endregion
 
     }
 }
