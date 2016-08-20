@@ -80,6 +80,9 @@ namespace QFinder
             {
                 try
                 {
+
+                    if (SpecialCommands.RunStaticCommand(txtFind.Text.Trim())) return;
+
                     var selected = lstFiles.SelectedItems;
                     if (selected != null && selected.Count > 0 && selected[0] != null)
                     {
@@ -95,7 +98,7 @@ namespace QFinder
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("The item you entered has failed to start. Please check if the file still exists or the command is an available one." +
+                    MessageBox.Show("The command you entered has failed to start. Please check if the file still exists or the command is an available one." +
                         "\r\n\r\n Internal Error message: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }

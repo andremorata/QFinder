@@ -70,6 +70,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmManageIndexFolders.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmManageIndexFolders.Designer.cs">
+      <DependentUpon>frmManageIndexFolders.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\AppController.cs" />
     <Compile Include="Data\DBManager.cs" />
     <Compile Include="Data\Model.cs" />
@@ -80,12 +86,16 @@
       <DependentUpon>frmFind.cs</DependentUpon>
     </Compile>
     <Compile Include="Helpers\Log.cs" />
+    <Compile Include="Helpers\SpecialCommands.cs" />
     <Compile Include="Helpers\TypeAssistant.cs" />
     <Compile Include="Index\Index.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmFind.resx">
       <DependentUpon>frmFind.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmManageIndexFolders.resx">
+      <DependentUpon>frmManageIndexFolders.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
