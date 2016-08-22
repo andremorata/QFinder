@@ -178,6 +178,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "QFinder";
             this.TopMost = true;
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmFind_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmFind_KeyDown);
             this.ResumeLayout(false);
             this.PerformLayout();

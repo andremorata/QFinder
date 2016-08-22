@@ -239,6 +239,10 @@ namespace QFinder
                 Program.Idx.BuildIndex();
             }
         }
-        
+
+        private void frmFind_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }
