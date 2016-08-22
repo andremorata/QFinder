@@ -98,8 +98,8 @@ namespace QFinder
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("The command you entered has failed to start. Please check if the file still exists or the command is an available one." +
-                        "\r\n\r\n Internal Error message: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("The command you entered has failed to start. Please check if the file still exists or if this is an available command." +
+                        "\r\n\r\n---------------------------\r\n Internal Error message: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
@@ -138,7 +138,7 @@ namespace QFinder
 
         private void txtFind_TextChanged(object sender, EventArgs e)
         {
-            if (txtFind.Text.Length >= 3) assistant.TextChanged();
+            if (txtFind.Text.Length >= 1) assistant.TextChanged();
         }
 
         private ICollection<FileIndex> GetIndex(string text)

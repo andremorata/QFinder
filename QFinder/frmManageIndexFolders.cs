@@ -1,4 +1,5 @@
 ﻿using QFinder.Data;
+using QFinder.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,6 +15,9 @@ namespace QFinder
 {
     public partial class frmManageIndexFolders : Form
     {
+
+        int EditingItem = 0;
+
         public frmManageIndexFolders()
         {
             InitializeComponent();
@@ -101,10 +105,95 @@ namespace QFinder
                 }
             }
         }
-
-        private void button1_Click(object sender, EventArgs e)
+        
+        private void btnBrowse_Click(object sender, EventArgs e)
         {
+            if (dlgFolderBrowse.ShowDialog() == DialogResult.OK)
+                txtPath.Text = dlgFolderBrowse.SelectedPath;
+        }
 
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(txtPath.Text.Trim()))
+                {
+                    using (Model model = new Model())
+                    {
+                        if (EditingItem == 0) //new
+                        {
+                            model.IndexingPaths.Add(new IndexingPath() { Path = txtPath.Text.Trim() });
+                        }
+                        else //updating
+                        {
+                            var item = model.IndexingPaths.FirstOrDefault(i => i.Id == EditingItem);
+                            if (item != null)
+                            {
+                                item.Path = txtPath.Text.Trim();
+                            }
+                        }
+                        model.SaveChanges();
+                        ClearEditing();
+                        MessageBox.Show("Path saved successfuly", "QFinder", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Write(System.Diagnostics.EventLogEntryType.Error, $"QFinder - Index Paths - Error: {ex.Message}\r\n---------\r\n{ex.StackTrace}");
+                MessageBox.Show( $"Error saving the path. Error: {ex.Message}", "QFinder", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnRemove_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (Model model = new Model())
+                {
+                    if (EditingItem != 0) //new
+                    {
+                        var item = model.IndexingPaths.FirstOrDefault(i => i.Id == EditingItem);
+                        if (item != null)
+                        {
+                            if (MessageBox.Show("Are you sure?", "QFinder - Removing path of the index", 
+                                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                            {
+                                model.IndexingPaths.Remove(item);
+                                model.SaveChanges();
+                                ClearEditing();
+                                MessageBox.Show("Path removed successfuly", "QFinder", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Write(System.Diagnostics.EventLogEntryType.Error, $"QFinder - Index Paths - Error: {ex.Message}\r\n---------\r\n{ex.StackTrace}");
+                MessageBox.Show($"Error removing the path. Error: {ex.Message}", "QFinder", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            ClearEditing();
+        }
+
+        private void ClearEditing()
+        {
+            txtPath.Clear();
+            EditingItem = 0;
+            txtPath.Focus();
+            LoadGrid();
+        }
+
+        private void grd_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var item = grd.Rows[e.RowIndex];
+            EditingItem = (int)item.Cells[0].Value;
+            txtPath.Text = (string)item.Cells[1].Value;
+            txtPath.Focus();
         }
     }
 }

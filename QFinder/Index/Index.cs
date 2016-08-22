@@ -103,36 +103,18 @@ namespace QFinder.Index
         {
             try
             {
-
-                var type = GetIfIsFileOrFolder(path);
-
-                if (type == null) return;
-
                 Model model = new Model();
-
-                var itemType = model.FileIndexTypes.FirstOrDefault(i => i.Name == type);
-
-                var folder = path;
-                if (itemType.Name != "Folder")
-                    folder = path.Substring(0, path.LastIndexOf("\\"));
-
-                var ext = "";
-                var name = path.Substring(path.LastIndexOf("\\") + 1);
-                if (itemType.Name != "Folder" && name.LastIndexOf(".") >= 0)
-                {
-                    ext = name.Substring(name.LastIndexOf(".") + 1).ToUpper();
-                    name = name.Substring(0, name.LastIndexOf("."));
-                }
-
-                if (!model.Files.Any(i => i.Path == folder && i.Name == name && i.Extension == ext))
+                var addItem = GetItemForIndex(path);
+                if (addItem != null &&
+                    !model.Files.Any(i => i.Path == addItem.Path && i.Name == addItem.Name && i.Extension == addItem.Extension))
                 {
                     model.Files.Add(
                         new FileIndex()
                         {
-                            Type = itemType,
-                            Name = name,
-                            Extension = ext,
-                            Path = folder
+                            Type = addItem.Type,
+                            Name = addItem.Name,
+                            Extension = addItem.Extension,
+                            Path = addItem.Path
                         });
                 }
                 model.SaveChanges();
@@ -142,6 +124,49 @@ namespace QFinder.Index
                 LogFailure(ex.Message + "\r\n" + path);
             }
 
+        }
+
+        private FileIndex GetItemForIndex(string path)
+        {
+            var type = GetIfIsFileOrFolder(path);
+            if (type == null) return null;
+
+            Model model = new Model();
+
+            var itemType = model.FileIndexTypes.FirstOrDefault(i => i.Name == type);
+
+            var folder = path;
+            if (itemType.Name != "Folder")
+                folder = path.Substring(0, path.LastIndexOf("\\"));
+
+            var ext = "";
+            var name = path.Substring(path.LastIndexOf("\\") + 1);
+            if (itemType.Name != "Folder" && name.LastIndexOf(".") >= 0)
+            {
+                ext = name.Substring(name.LastIndexOf(".") + 1).ToUpper();
+                name = name.Substring(0, name.LastIndexOf("."));
+            }
+
+            return new FileIndex()
+            {
+                Type = itemType,
+                Name = name,
+                Extension = ext,
+                Path = folder
+            };
+        }
+
+        private FileIndex GetItemSegments(string path)
+        {
+            var itemData = new FileIndex();
+            itemData.Path = path.Substring(0, path.LastIndexOf('\\'));
+            itemData.Name = path.Substring(path.LastIndexOf('\\') + 1);
+            if (itemData.Name.LastIndexOf('.') > -1)
+            {
+                itemData.Extension = itemData.Name.Substring(itemData.Name.LastIndexOf('.') + 1).ToUpper();
+                itemData.Name = itemData.Name.Substring(0, itemData.Name.LastIndexOf('.'));
+            }
+            return itemData;
         }
 
         private void LogFailure(string error)
@@ -194,14 +219,22 @@ namespace QFinder.Index
             {
                 using (Model model = new Model())
                 {
-                    var file = model.Files.FirstOrDefault(i =>
-                        i.FullPath.Equals(e.FullPath, StringComparison.InvariantCultureIgnoreCase));
-                    if (file != null)
+                    var FileNameData = GetItemSegments(e.FullPath);
+
+                    if (FileNameData != null)
                     {
-                        model.Files.Remove(file);
-                        model.SaveChanges();
+                        var file = model.Files.FirstOrDefault(i =>
+                        i.Path.ToLower().Equals(FileNameData.Path.ToLower()) &&
+                        i.Name.ToLower().Equals(FileNameData.Name.ToLower()) &&
+                        i.Extension.Equals(FileNameData.Extension));
+
+                        if (file != null)
+                        {
+                            model.Files.Remove(file);
+                            model.SaveChanges();
+                        }
+                        Log.Write($"QFinder - File removed from index - {e.FullPath}");
                     }
-                    Log.Write($"QFinder - File removed from index - {e.FullPath}");
                 }
             }
             catch (Exception ex)
@@ -216,16 +249,25 @@ namespace QFinder.Index
             {
                 using (Model model = new Model())
                 {
-                    var file = model.Files.FirstOrDefault(i =>
-                        i.FullPath.Equals(e.OldFullPath, StringComparison.InvariantCultureIgnoreCase));
-                    if (file != null)
-                    {
-                        model.Files.Remove(file);
-                        model.SaveChanges();
+                    var oldFileNameData = GetItemSegments(e.OldFullPath);
 
-                        AddIndexedItem(e.FullPath);
+                    if (oldFileNameData != null)
+                    {
+                        var file = model.Files.FirstOrDefault(i =>
+                        i.Path.ToLower().Equals(oldFileNameData.Path.ToLower()) &&
+                        i.Name.ToLower().Equals(oldFileNameData.Name.ToLower()) &&
+                        i.Extension.Equals(oldFileNameData.Extension));
+
+                        if (file != null)
+                        {
+                            model.Files.Remove(file);
+                            model.SaveChanges();
+
+                            AddIndexedItem(e.FullPath);
+                        }
+                        Log.Write($"QFinder - File removed from index - {e.FullPath}");
                     }
-                    Log.Write($"QFinder - File removed from index - {e.FullPath}");
+
                 }
             }
             catch (Exception ex)
