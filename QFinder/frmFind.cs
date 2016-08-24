@@ -55,9 +55,7 @@ namespace QFinder
             });
             lbInfo.Text = count;
         }
-
-        #region initialize and form handles
-
+        
         private new void Hide()
         {
             base.WindowState = FormWindowState.Minimized;
@@ -66,8 +64,6 @@ namespace QFinder
             lbFullPath.Text = "";
             lstFiles.Items.Clear();
         }
-        
-        #endregion
 
         private void frmFind_KeyDown(object sender, KeyEventArgs e)
         {
@@ -243,6 +239,11 @@ namespace QFinder
         private void frmFind_FormClosing(object sender, FormClosingEventArgs e)
         {
             Application.Exit();
+        }
+
+        private void frmFind_Resize(object sender, EventArgs e)
+        {
+            txtFind.Focus();
         }
     }
 }

@@ -180,6 +180,7 @@
             this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmFind_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmFind_KeyDown);
+            this.Resize += new System.EventHandler(this.frmFind_Resize);
             this.ResumeLayout(false);
             this.PerformLayout();
 
