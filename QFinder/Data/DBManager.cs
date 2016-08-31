@@ -25,7 +25,7 @@ namespace QFinder.Data
 
         public string GetConnectionString()
         {
-            return $"Data Source={Folder}Index.sdf;Password=Holy!QFinder!!!";
+            return $"Data Source={Folder}Index.sdf;Password=Holy!QFinder!!!;LCID=1033;";
         }
 
         public bool Check()
@@ -72,7 +72,8 @@ namespace QFinder.Data
                     m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Project Manager - Desenvolvimento" });
                     m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Learning" });
                     m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Andre" });
-                    
+                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Pictures" });
+
                     m.SaveChanges();
                 }
 

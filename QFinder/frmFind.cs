@@ -77,7 +77,12 @@ namespace QFinder
                 try
                 {
 
-                    if (SpecialCommands.RunStaticCommand(txtFind.Text.Trim())) return;
+                    if (SpecialCommands.RunStaticCommand(txtFind.Text))
+                    {
+                        txtFind.Clear();
+                        txtFind.Focus();
+                        return;
+                    }
 
                     var selected = lstFiles.SelectedItems;
                     if (selected != null && selected.Count > 0 && selected[0] != null)
@@ -141,6 +146,7 @@ namespace QFinder
         {
             using (var model = new Model())
             {
+                //text = text.RemoveDiacritics();
                 var type = "";
                 if (text.Contains(">"))
                 {
@@ -167,7 +173,7 @@ namespace QFinder
                         {
                             var val = term.Replace("*", "");
                             files = files.Where(i => i.Name.ToLower()
-                                .Substring(i.Name.Length - val.Length, val.Length) == val.ToLower()); //.EndsWith(term.ToLower()));
+                                .Substring(i.Name.Length - val.Length, val.Length) == val.ToLower()); 
                         }
                         else if (term.EndsWith("*"))
                         {

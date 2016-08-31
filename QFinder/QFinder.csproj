@@ -87,6 +87,7 @@
     </Compile>
     <Compile Include="Helpers\Log.cs" />
     <Compile Include="Helpers\SpecialCommands.cs" />
+    <Compile Include="Helpers\StringExtensions.cs" />
     <Compile Include="Helpers\TypeAssistant.cs" />
     <Compile Include="Index\Index.cs" />
     <Compile Include="Program.cs" />
