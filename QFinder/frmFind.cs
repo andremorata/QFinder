@@ -34,10 +34,9 @@ namespace QFinder
 
                 //Run indexing subsystem
                 Program.Idx = new Index.Index();
-                //Program.Idx.BuildIndex();
                 Program.Idx.StartMonitoring();
             });
-
+            BringToFront();
             ShowIndexInfo();
             txtFind.Focus();
 
@@ -88,7 +87,10 @@ namespace QFinder
                     if (selected != null && selected.Count > 0 && selected[0] != null)
                     {
                         var item = selected[0];
-                        Process.Start(item.SubItems[3].Text); //fullpath
+                        if (!e.Control)
+                            Process.Start(item.SubItems[3].Text); //fullpath
+                        else
+                            Process.Start("explorer.exe", $"/select,{item.SubItems[3].Text}"); //open folder with item selected
                         Hide();
                     }
                     else if (!string.IsNullOrEmpty(txtFind.Text.Trim()))
@@ -199,7 +201,12 @@ namespace QFinder
                     files = files.Where(i => i.Name.ToLower().Contains(text.ToLower()));
                 }
 
-                return files.ToList();
+                return files
+                    .OrderByDescending(i=> i.Type.Name)
+                    .ThenBy(i=> i.Name)
+                    .Take(50) //50 items tops
+                    .ToList(); 
+
             }
         }
 

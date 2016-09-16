@@ -38,6 +38,7 @@
             this.colType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colExt = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colFullPath = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colFolder = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lbInfo = new System.Windows.Forms.Label();
             this.lbFullPath = new System.Windows.Forms.Label();
             this.tmrInfo = new System.Windows.Forms.Timer(this.components);
@@ -61,6 +62,8 @@
             // 
             // txtFind
             // 
+            this.txtFind.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.txtFind.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.AllSystemSources;
             this.txtFind.BackColor = System.Drawing.Color.Black;
             this.txtFind.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtFind.ForeColor = System.Drawing.Color.White;
@@ -78,7 +81,8 @@
             this.ColName,
             this.colType,
             this.colExt,
-            this.colFullPath});
+            this.colFullPath,
+            this.colFolder});
             this.lstFiles.Font = new System.Drawing.Font("Ubuntu Light", 11F);
             this.lstFiles.ForeColor = System.Drawing.Color.White;
             this.lstFiles.FullRowSelect = true;
@@ -112,6 +116,11 @@
             // 
             this.colFullPath.Text = "FullPath";
             this.colFullPath.Width = 0;
+            // 
+            // colFolder
+            // 
+            this.colFolder.Text = "Folder";
+            this.colFolder.Width = 0;
             // 
             // lbInfo
             // 
@@ -177,7 +186,6 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "QFinder";
-            this.TopMost = true;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmFind_FormClosing);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmFind_KeyDown);
             this.Resize += new System.EventHandler(this.frmFind_Resize);
@@ -199,6 +207,7 @@
         private System.Windows.Forms.Label lbFullPath;
         private System.Windows.Forms.Timer tmrInfo;
         private System.Windows.Forms.Label lbReindex;
+        private System.Windows.Forms.ColumnHeader colFolder;
     }
 }
 
