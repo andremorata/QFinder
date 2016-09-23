@@ -15,6 +15,7 @@ namespace QFinder
     {
 
         TypeAssistant assistant;
+        List<string> history;
 
         public frmFind()
         {
@@ -24,6 +25,8 @@ namespace QFinder
 
             assistant = new TypeAssistant(1000);
             assistant.Idled += Assistant_Idled;
+
+            history = new List<string>();
 
             Task.Run(() =>
             {
@@ -54,7 +57,7 @@ namespace QFinder
             });
             lbInfo.Text = count;
         }
-        
+
         private new void Hide()
         {
             base.WindowState = FormWindowState.Minimized;
@@ -106,6 +109,42 @@ namespace QFinder
                 }
             }
 
+            if (e.KeyCode == Keys.Up && txtFind.Focused && e.Shift)
+            {
+                var val = txtFind.Text.Trim();
+                var item = history.FirstOrDefault(i => i == val);
+                if (!string.IsNullOrEmpty(item))
+                {
+                    var pos = history.IndexOf(item);
+                    if (pos > 0)
+                        txtFind.Text = history[pos - 1];
+                    else
+                        txtFind.Text = history.Last();
+                }
+                else
+                    txtFind.Text = history[history.Count - 1];
+                txtFind.Update(); txtFind.SelectAll(); txtFind.Focus();
+                return;
+            }
+
+            if (e.KeyCode == Keys.Down && txtFind.Focused && e.Shift)
+            {
+                var val = txtFind.Text.Trim();
+                var item = history.FirstOrDefault(i => i == val);
+                if (!string.IsNullOrEmpty(item))
+                {
+                    var pos = history.IndexOf(item);
+                    if (pos < history.Count -1)
+                        txtFind.Text = history[history.IndexOf(item) + 1];
+                    else
+                        txtFind.Text = history[0];
+                }
+                else
+                    txtFind.Text = history[0];
+                txtFind.Update(); txtFind.SelectAll(); txtFind.Focus();
+                return;
+            }
+
             if (e.KeyCode == Keys.Down && txtFind.Focused && lstFiles.Items.Count > 0)
             {
                 lstFiles.Focus();
@@ -129,12 +168,18 @@ namespace QFinder
             this.Invoke(
                 new MethodInvoker(() =>
                 {
+                    var val = txtFind.Text.Trim();
+                    var item = history.FirstOrDefault(i => i == val);
+                    if (item == null) history.Add(val);
+                    if (history.Count > 25)
+                        history.RemoveAt(0);
+
                     lstFiles.Items.Clear();
                     lbFullPath.Text = "";
-                    var suggests = GetIndex(txtFind.Text.Trim());
-                    foreach (var item in suggests)
+                    var suggests = GetIndex(val);
+                    foreach (var i in suggests)
                         lstFiles.Items.Add(new ListViewItem(
-                            new string[] { item.FileName, item.Type.Name, item.Extension, item.FullPath }));
+                            new string[] { i.FileName, i.Type.Name, i.Extension, i.FullPath }));
                 })
             );
         }
@@ -175,7 +220,7 @@ namespace QFinder
                         {
                             var val = term.Replace("*", "");
                             files = files.Where(i => i.Name.ToLower()
-                                .Substring(i.Name.Length - val.Length, val.Length) == val.ToLower()); 
+                                .Substring(i.Name.Length - val.Length, val.Length) == val.ToLower());
                         }
                         else if (term.EndsWith("*"))
                         {
@@ -202,10 +247,10 @@ namespace QFinder
                 }
 
                 return files
-                    .OrderByDescending(i=> i.Type.Name)
-                    .ThenBy(i=> i.Name)
+                    .OrderByDescending(i => i.Type.Name)
+                    .ThenBy(i => i.Name)
                     .Take(50) //50 items tops
-                    .ToList(); 
+                    .ToList();
 
             }
         }
@@ -242,7 +287,7 @@ namespace QFinder
 
         private void lbReindex_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Are you sure that you want to re-map all files? This might take few minutes to complete.", 
+            if (MessageBox.Show("Are you sure that you want to re-map all files? This might take few minutes to complete.",
                 "Rebuild Index", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
             {
                 Program.Idx.BuildIndex();
