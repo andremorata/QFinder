@@ -15,11 +15,14 @@ namespace QFinder.Helpers
             {
                 case "help":
                     StringBuilder str = new StringBuilder();
+                    str.AppendLine("\r\n\r\n");
                     str.AppendLine("Commands:");
                     str.AppendLine("Help: This dialog;");
                     str.AppendLine("Exit: Terminates the app instance;");
                     str.AppendLine("EditIndexPaths or EID: Shows the index paths manager interface;");
-                    str.AppendLine("");
+                    str.AppendLine("EditIndexSchedule or EIS: Shows the automatic index scheduler interface;");
+                    str.AppendLine("BuildIndex: Gets confirmation to start mapping or re-mapping files;");
+                    str.AppendLine("\r\n\r\n");
                     str.AppendLine("Query Options:");
                     str.AppendLine("To query files by its name, simply type few pieces of the file name between spaces. Ex: grandma's recipe;");
                     str.AppendLine("To query files of a specific type, use the extensions that you want to filter followed by an '>' and then the terms to filter the file name. EX: 'docx>grandma's recipe';");
@@ -38,6 +41,10 @@ namespace QFinder.Helpers
                 case "eis":
                     frmIndexSchedule s = new frmIndexSchedule();
                     s.ShowDialog(); return true;
+                case "buildindex":
+                    if (MessageBox.Show("Are you sure that you want to map/re-map all files? This might take a while to complete.",
+                        "Rebuild Index", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) App.Idx.BuildIndex();
+                    break;
                 default:
                     break;
             }
