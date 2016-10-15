@@ -13,7 +13,7 @@ namespace QFinder.Helpers
         /// </summary>
         public static void Write(EventLogEntryType type, string sEvent)
         {
-            if (Program.LogEnabled)
+            if (App.LogEnabled)
             {
                 try
                 {
@@ -37,7 +37,7 @@ namespace QFinder.Helpers
 
         public static void Write(string sEvent)
         {
-            if (Program.LogEnabled)
+            if (App.LogEnabled)
             {
                 Write(EventLogEntryType.Information, sEvent);
             }
@@ -65,7 +65,7 @@ namespace QFinder.Helpers
 
         public static void LogToFile(Exception exc, string source)
         {
-            if (Program.LogEnabled)
+            if (App.LogEnabled)
             {
                 try
                 {

@@ -7,8 +7,7 @@ namespace QFinder.Data
  
     public class Model : DbContext
     {
-        public Model()
-            : base(Program.DB.GetConnectionString())
+        public Model() : base(App.DB.GetConnectionString())
         {
            
         }
@@ -16,6 +15,7 @@ namespace QFinder.Data
         public virtual DbSet<FileIndex> Files { get; set; }
         public virtual DbSet<FileIndexType> FileIndexTypes { get; set; }
         public virtual DbSet<IndexingPath> IndexingPaths { get; set; }
+        public virtual DbSet<IndexSchedule> IndexSchedule { get; set; }
     }
 
     public class FileIndexType
@@ -35,7 +35,9 @@ namespace QFinder.Data
         public string Extension { get; set; }
         [Index]
         public string Path { get; set; }
-        public FileIndexType Type { get; set; }
+        public int TypeId { get; set; }
+        [ForeignKey("TypeId")]
+        public virtual FileIndexType Type { get; set; }
         public string FileName
         {
             get
@@ -63,5 +65,14 @@ namespace QFinder.Data
         [Key]
         public int Id { get; set; }
         public string Path { get; set; }
+    }
+
+    public class IndexSchedule
+    {
+        [Key]
+        public int Id { get; set; }
+        public bool Enabled { get; set; }
+        public int Value { get; set; }
+        public string Type { get; set; }
     }
 }

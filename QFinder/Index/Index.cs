@@ -8,10 +8,18 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QFinder.Index
+namespace QFinder.Indexing
 {
     class Index
     {
+        private List<FileSystemWatcher> monitors;
+        System.Windows.Forms.Timer IndexScheduler = new System.Windows.Forms.Timer();
+
+        public Index()
+        {
+            monitors = new List<FileSystemWatcher>();
+        }
+
         public void BuildIndex()
         {
             var indexTask = Task.Run(() =>
@@ -37,7 +45,7 @@ namespace QFinder.Index
 
                 var toBeRemoved = new List<FileIndex>();
                 foreach (var item in model.Files)
-                    if (!mapped.Any(i => i == item.FullPath))
+                    if (!mapped.Any(i => i.ToLower() == item.FullPath.ToLower()))
                         toBeRemoved.Add(item);
 
                 model.Files.RemoveRange(toBeRemoved);
@@ -89,6 +97,48 @@ namespace QFinder.Index
             return ret.ToArray();
         }
 
+        internal void CheckSchedule()
+        {
+            var schedule = App.Idx.GetIndexSchedule();
+            if (schedule.Enabled)
+            {
+                var multiplier = 0;
+                switch (schedule.Type)
+                {
+                    case "Minutes":
+                        multiplier = 60;
+                        break;
+                    case "Hours":
+                        multiplier = 60 * 60;
+                        break;
+                    case "Days":
+                        multiplier = 60 * 60 * 24;
+                        break;
+                    case "Weeks":
+                        multiplier = 60 * 60 * 24 * 7;
+                        break;
+                    default:
+                        break;
+                }
+                var interval = 1000 * multiplier;
+
+                IndexScheduler = null;
+                IndexScheduler = new System.Windows.Forms.Timer();
+                IndexScheduler.Interval = schedule.Value * interval;
+                IndexScheduler.Tick += IndexScheduler_Tick;
+                IndexScheduler.Start();
+            }
+            else
+                IndexScheduler.Stop();
+        }
+
+        private void IndexScheduler_Tick(object sender, EventArgs e)
+        {
+            BuildIndex();
+        }
+
+        #region Utils
+
         private string GetIfIsFileOrFolder(string path)
         {
             if (Directory.Exists(path))
@@ -112,6 +162,7 @@ namespace QFinder.Index
                         new FileIndex()
                         {
                             Type = addItem.Type,
+                            TypeId = addItem.Type.Id,
                             Name = addItem.Name,
                             Extension = addItem.Extension,
                             Path = addItem.Path
@@ -150,10 +201,17 @@ namespace QFinder.Index
             return new FileIndex()
             {
                 Type = itemType,
+                TypeId = itemType.Id,
                 Name = name,
                 Extension = ext,
                 Path = folder
             };
+        }
+
+        internal void RestartLiveMonitoring()
+        {
+            StopAllMonitors();
+            StartMonitoring();
         }
 
         private FileIndex GetItemSegments(string path)
@@ -173,6 +231,41 @@ namespace QFinder.Index
         {
             Log.Write(EventLogEntryType.Error, error);
         }
+        
+        public IndexSchedule GetIndexSchedule()
+        {
+            using (Model db = new Model())
+            {
+                var schedule = db.IndexSchedule.FirstOrDefault();
+                return schedule ?? new IndexSchedule()
+                {
+                    Enabled = true,
+                    Type = "Days",
+                    Value = 1
+                };
+            }
+        }
+
+        public void UpdateIndexSchedule(IndexSchedule m)
+        {
+            using (Model db = new Model())
+            {
+                var schedule = db.IndexSchedule.FirstOrDefault();
+                if (schedule != null)
+                {
+                    schedule.Enabled = m.Enabled;
+                    schedule.Type = m.Type;
+                    schedule.Value = m.Value;
+                }
+                else
+                {
+                    db.IndexSchedule.Add(m);
+                }
+                db.SaveChanges();
+            }
+        }
+
+        #endregion
 
         #region Index Live Monitoring
 
@@ -183,6 +276,18 @@ namespace QFinder.Index
             foreach (var dir in dirs)
             {
                 AddWatcher(dir);
+            }
+        }
+
+        public void StopAllMonitors ()
+        {
+            while (monitors.Count > 0)
+            {
+                var monitor = monitors[0];
+                monitor.EnableRaisingEvents = false;
+                monitor.Dispose();
+                monitor = null;
+                monitors.RemoveAt(0);
             }
         }
 
@@ -197,6 +302,8 @@ namespace QFinder.Index
             watcher.Renamed += Watcher_Renamed; ;
             watcher.IncludeSubdirectories = true;
             watcher.EnableRaisingEvents = true;
+
+            monitors.Add(watcher);
         }
 
         private void Watcher_Created(object sender, FileSystemEventArgs e)

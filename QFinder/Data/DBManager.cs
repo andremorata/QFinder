@@ -59,22 +59,15 @@ namespace QFinder.Data
         {
             try
             {
-                Model m = new Model();                
-                if (!m.IndexingPaths.Any())
+                Model m = new Model();
+                if (!m.IndexSchedule.Any())
                 {
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\RDP" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\OneDrive" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\PM" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Project Manager - Projetos" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Project Manager - Propostas Comerciais" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Project Manager - Institucional" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Project Manager - Diretoria" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Project Manager - Desenvolvimento" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Learning" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Files\Google Drive\Andre" });
-                    m.IndexingPaths.Add(new IndexingPath() { Path = @"D:\Pictures" });
-
-                    m.SaveChanges();
+                    m.IndexSchedule.Add(
+                        new IndexSchedule()
+                        {
+                            Type = "Days",
+                            Value = 1
+                        });
                 }
 
                 if (!m.FileIndexTypes.Any())

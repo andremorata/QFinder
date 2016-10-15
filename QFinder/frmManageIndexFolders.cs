@@ -134,6 +134,7 @@ namespace QFinder
                         }
                         model.SaveChanges();
                         ClearEditing();
+                        App.Idx.RestartLiveMonitoring();
                         MessageBox.Show("Path saved successfuly", "QFinder", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }

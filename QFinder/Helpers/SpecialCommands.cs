@@ -34,6 +34,10 @@ namespace QFinder.Helpers
                 case "eid":
                     frmManageIndexFolders f = new frmManageIndexFolders();
                     f.ShowDialog(); return true;
+                case "editindexschedule":
+                case "eis":
+                    frmIndexSchedule s = new frmIndexSchedule();
+                    s.ShowDialog(); return true;
                 default:
                     break;
             }

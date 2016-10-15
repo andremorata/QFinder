@@ -31,20 +31,23 @@ namespace QFinder
             Task.Run(() =>
             {
                 //Application startup
-                Program.DB = new Data.DB();
-                Program.DB.Folder = Application.StartupPath + "\\Data";
-                if (!Program.DB.Check()) Program.DB.CreateDB();
+                App.DB = new Data.DB();
+                App.DB.Folder = Application.StartupPath + "\\Data";
+                if (!App.DB.Check()) App.DB.CreateDB();
 
                 //Run indexing subsystem
-                Program.Idx = new Index.Index();
-                Program.Idx.StartMonitoring();
+                App.Idx = new Indexing.Index();
+                App.Idx.StartMonitoring();
+
+                App.Idx.CheckSchedule();
             });
+            
             BringToFront();
             ShowIndexInfo();
             txtFind.Focus();
-
+            
         }
-
+        
         private async void ShowIndexInfo()
         {
             var count = "";
@@ -134,7 +137,7 @@ namespace QFinder
                 if (!string.IsNullOrEmpty(item))
                 {
                     var pos = history.IndexOf(item);
-                    if (pos < history.Count -1)
+                    if (pos < history.Count - 1)
                         txtFind.Text = history[history.IndexOf(item) + 1];
                     else
                         txtFind.Text = history[0];
@@ -290,7 +293,7 @@ namespace QFinder
             if (MessageBox.Show("Are you sure that you want to re-map all files? This might take few minutes to complete.",
                 "Rebuild Index", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
             {
-                Program.Idx.BuildIndex();
+                App.Idx.BuildIndex();
             }
         }
 
@@ -303,5 +306,6 @@ namespace QFinder
         {
             txtFind.Focus();
         }
+        
     }
 }
