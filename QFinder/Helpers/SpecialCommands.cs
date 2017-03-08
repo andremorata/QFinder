@@ -21,7 +21,8 @@ namespace QFinder.Helpers
                     str.AppendLine("\r\nEditIndexPaths or EID: Shows the index paths manager interface;");
                     str.AppendLine("\r\nEditIndexSchedule or EIS: Shows the automatic index scheduler interface;");
                     str.AppendLine("\r\nBuildIndex: Gets confirmation to start mapping or re-mapping files;");
-                    str.AppendLine("\r\n\r\n");
+					str.AppendLine("\r\nResetIndex: Gets confirmation to clear all data in the index and start re-mapping files;");
+					str.AppendLine("\r\n\r\n");
                     str.AppendLine("Query Options:");
                     str.AppendLine("\r\nTo query files by its name, simply type few pieces of the file name between spaces. Ex: grandma's recipe;");
                     str.AppendLine("\r\nTo query files of a specific type, use the extensions that you want to filter followed by an '>' and then the terms to filter the file name. EX: 'docx>grandma's recipe';");
@@ -42,9 +43,13 @@ namespace QFinder.Helpers
                     s.ShowDialog(); return true;
                 case "buildindex":
                     if (MessageBox.Show("Are you sure that you want to map/re-map all files? This might take a while to complete.",
-                        "Rebuild Index", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) App.Idx.BuildIndex();
+                        "Rebuild Index", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) App.Idx.RebuildIndex();
                     break;
-                default:
+				case "resetindex":
+					if (MessageBox.Show("Are you sure that you want to DESTROY and re-map all files? This action might take several minutes to complete, depending on how much locations you have in your index.",
+						"Rebuild Index", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) App.Idx.DestroyAndRebuildIndex();
+					break;
+				default:
                     break;
             }
             return false;
