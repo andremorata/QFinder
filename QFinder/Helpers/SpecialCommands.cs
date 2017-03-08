@@ -43,12 +43,10 @@ namespace QFinder.Helpers
                     s.ShowDialog(); return true;
                 case "buildindex":
                     if (MessageBox.Show("Are you sure that you want to map/re-map all files? This might take a while to complete.",
-                        "Rebuild Index", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) App.Idx.RebuildIndex();
-                    break;
+                        "Rebuild Index", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) App.Idx.RebuildIndex(); return true;
 				case "resetindex":
 					if (MessageBox.Show("Are you sure that you want to DESTROY and re-map all files? This action might take several minutes to complete, depending on how much locations you have in your index.",
-						"Rebuild Index", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) App.Idx.DestroyAndRebuildIndex();
-					break;
+						"Rebuild Index", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK) App.Idx.DestroyAndRebuildIndex(); return true;
 				default:
                     break;
             }
