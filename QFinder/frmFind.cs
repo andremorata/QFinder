@@ -30,10 +30,12 @@ namespace QFinder
 
 			Task.Run(() =>
 			{
-				//Application startup
-				App.DB = new DB();
-				App.DB.Folder = Application.StartupPath + "\\Data";
-				if (!App.DB.Check()) App.DB.CreateDB();
+                //Application startup
+                App.DB = new DB()
+                {
+                    Folder = Application.StartupPath + "\\Data"
+                };
+                if (!App.DB.Check()) App.DB.CreateDB();
 
 				//Run indexing subsystem
 				App.Idx = new Indexing.Index();
@@ -55,7 +57,7 @@ namespace QFinder
 			{
 				using (var m = new Model())
 				{
-					count = $"{m.Files.LongCount().ToString()} files mapped.";
+					count = $"{m.Files.Count().ToString()} files mapped.";
 				}
 			});
 			lbInfo.Text = count;

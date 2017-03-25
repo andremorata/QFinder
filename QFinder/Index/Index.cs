@@ -175,8 +175,7 @@ namespace QFinder.Indexing
 					model.Files.Add(
 						new FileIndex()
 						{
-							Type = addItem.Type,
-							TypeId = addItem.Type.Id,
+							TypeId = addItem.TypeId,
 							Name = addItem.Name,
 							Extension = addItem.Extension,
 							Path = addItem.Path
@@ -214,7 +213,6 @@ namespace QFinder.Indexing
 
 			return new FileIndex()
 			{
-				Type = itemType,
 				TypeId = itemType.Id,
 				Name = name,
 				Extension = ext,

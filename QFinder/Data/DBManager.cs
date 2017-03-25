@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlServerCe;
+using System.Data.Common;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace QFinder.Data
 {
     public class DB
     {
         private string _folder;
+        private const string dbName = "QFinder.Index.db3";
+
         public string Folder
         {
             get
@@ -25,33 +26,33 @@ namespace QFinder.Data
 
         public string GetConnectionString()
         {
-            return $"Data Source={Folder}Index.sdf;Password=Holy!QFinder!!!;LCID=1033;";
+            return $"Data Source={Folder}{dbName};"; // ;Password=Holy!QFinder!!!;LCID=1033;";
+        }
+
+        public DbConnection GetConnection()
+        {
+            return new SQLiteConnection(GetConnectionString());
         }
 
         public bool Check()
         {
-            return File.Exists($"{Folder}Index.sdf");
+            return File.Exists($"{Folder}{dbName}");
         }
 
         public void CreateDB()
         {
             string connStr = GetConnectionString();
-            SqlCeConnection conn = new SqlCeConnection(connStr);
+            SQLiteConnection conn = new SQLiteConnection(connStr);
 
             if (!Directory.Exists(Folder)) Directory.CreateDirectory(Folder);
 
-            if (!File.Exists($"{Folder}Index.sdf"))
+            if (!File.Exists($"{Folder}{dbName}"))
             {
                 try
                 {
-                    SqlCeEngine engine = new SqlCeEngine(connStr);
-                    engine.CreateDatabase();
                     CheckDbStructure();
                 }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
+                catch (Exception ex) { throw ex; }
             }
         }
         
