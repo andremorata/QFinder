@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace QFinder.Indexing
 {
-	class Index
+	public class Index
 	{
 		private List<FileSystemWatcher> monitors;
 		System.Windows.Forms.Timer IndexScheduler = new System.Windows.Forms.Timer();
@@ -103,8 +103,7 @@ namespace QFinder.Indexing
 			{
 				Task.Run(() =>
 				{
-					model.Files.RemoveRange(
-					model.Files);
+					model.Files.RemoveRange(model.Files);
 					model.SaveChanges();
 				}).Wait();
 				RebuildIndex();

@@ -109,8 +109,10 @@ namespace QFinder
 				}
 				catch (Exception ex)
 				{
-					MessageBox.Show("The command you entered has failed to start. Please check if the file still exists or if this is an available command." +
-						"\r\n\r\n---------------------------\r\n Internal Error message: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					MessageBox.Show($@"The command you entered has failed to start. 
+                                        Please check if the file still exists or if this is an available command.
+                                        \r\n\r\n Internal Error message: {ex.Message}", "Error", 
+                                        MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 			}
 
@@ -205,7 +207,7 @@ namespace QFinder
 				var type = "";
 				if (text.Contains(">"))
 				{
-					type = text.Split('>')[0];
+					type = text.Split('>')[0].ToUpper();
 					text = text.Split('>')[1].Trim();
 				}
 
@@ -214,9 +216,9 @@ namespace QFinder
 
 				if (text.Contains("/"))
 				{
-					var folder = text.Split('/')[0];
+					var folder = text.Split('/')[0].ToLower();
 					text = text.Split('/')[1];
-					if (folder != "") files = files.Where(i => i.Path.Contains(folder));
+					if (folder != "") files = files.Where(i => i.Path.ToLower().Contains(folder));
 				}
 
 				var terms = text.Split(' ');
