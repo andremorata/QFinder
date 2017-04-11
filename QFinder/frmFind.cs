@@ -109,10 +109,9 @@ namespace QFinder
 				}
 				catch (Exception ex)
 				{
-					MessageBox.Show($@"The command you entered has failed to start. 
-                                        Please check if the file still exists or if this is an available command.
-                                        \r\n\r\n Internal Error message: {ex.Message}", "Error", 
-                                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+					MessageBox.Show("The command you entered has failed to start. Please check if the file still exists " + 
+                        $"or if this is an available command.\r\n\r\n Internal Error message: {ex.Message}", "Error", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
 			}
 
@@ -229,8 +228,8 @@ namespace QFinder
 						if (term.StartsWith("*"))
 						{
 							var val = term.Replace("*", "");
-							files = files.Where(i => i.Name.ToLower()
-								.Substring(i.Name.Length - val.Length, val.Length) == val.ToLower());
+                            files = files.Where(i => i.Name.ToLower().EndsWith(val.ToLower()));
+								//.Substring(i.Name.Length - val.Length, val.Length) == val.ToLower());
 						}
 						else if (term.EndsWith("*"))
 						{
@@ -242,18 +241,25 @@ namespace QFinder
 						{
 							var start = term.ToLower().Split('*')[0];
 							var end = term.ToLower().Split('*')[1];
-							files = files.Where(i => i.Name.ToLower()
-								.StartsWith(start) && i.Name.ToLower()
-								.Substring(i.Name.ToLower().Length - end.Length, end.Length) == end.ToLower()
+                            files = files.Where(i => 
+                                i.Name.ToLower().StartsWith(start) && 
+                                i.Name.ToLower().EndsWith(end)
+								//.Substring(i.Name.ToLower().Length - end.Length, end.Length) == end.ToLower()
 							);
 						}
 						else
-							files = files.Where(i => i.Name.ToLower().Contains(term.ToLower()));
+							files = files.Where(i => 
+                                i.Name.ToLower().Contains(term.ToLower()) ||
+                                term.ToLower().Contains(i.Name.ToLower() + "." + i.Extension.ToLower())
+                            );
 					}
 				}
 				else
 				{
-					files = files.Where(i => i.Name.ToLower().Contains(text.ToLower()));
+					files = files.Where(i => 
+                        i.Name.ToLower().Contains(text.ToLower()) ||
+                        text.ToLower().Contains(i.Name.ToLower() + "." + i.Extension.ToLower())
+                    );
 				}
 
 				return files
