@@ -26,7 +26,7 @@ namespace QFinder.Data
 
         public string GetConnectionString()
         {
-            return $"Data Source={Folder}{dbName};"; // ;Password=Holy!QFinder!!!;LCID=1033;";
+            return $"Data Source={Folder}{dbName};";
         }
 
         public DbConnection GetConnection()

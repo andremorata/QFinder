@@ -1,9 +1,5 @@
-﻿using QFinder.Data;
-using QFinder.Helpers;
+﻿using QFinder.Helpers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace QFinder
@@ -27,11 +23,7 @@ namespace QFinder
                 LogEnabled = true;
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                
-                //create a controller and Pass an instance of your application main form
                 var controller = new ApplicationController(new frmFind());
-
-                //Run application
                 controller.Run(Environment.GetCommandLineArgs());
                 
             }

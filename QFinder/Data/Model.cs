@@ -7,12 +7,12 @@ using System.Data.SQLite.EF6;
 
 namespace QFinder.Data
 {
- 
+
     public class Model : DbContext
     {
         public Model() : base(App.DB.GetConnection(), true)
         {
-            
+
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -31,6 +31,7 @@ namespace QFinder.Data
     {
         [Key]
         public int Id { get; set; }
+
         public string Name { get; set; }
     }
 
@@ -38,15 +39,21 @@ namespace QFinder.Data
     {
         [Key]
         public int Id { get; set; }
+
         [Index]
         public string Name { get; set; }
+
         [Index]
         public string Extension { get; set; }
+
         [Index]
         public string Path { get; set; }
+
         public int TypeId { get; set; }
+
         [ForeignKey("TypeId")]
         public virtual FileIndexType Type { get; set; }
+
         public string FileName
         {
             get
@@ -57,6 +64,7 @@ namespace QFinder.Data
                     return Name;
             }
         }
+
         public string FullPath
         {
             get
@@ -73,6 +81,7 @@ namespace QFinder.Data
     {
         [Key]
         public int Id { get; set; }
+
         public string Path { get; set; }
     }
 
@@ -80,8 +89,11 @@ namespace QFinder.Data
     {
         [Key]
         public int Id { get; set; }
+
         public bool Enabled { get; set; }
+
         public int Value { get; set; }
+
         public string Type { get; set; }
     }
 }
